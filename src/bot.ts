@@ -1,37 +1,65 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-const { ActivityTypes } = require('botbuilder');
+import {ActionTypes, ActivityTypes, ConversationState, StatePropertyAccessor, TurnContext} from "botbuilder";
+import {DialogSet} from "botbuilder-dialogs";
 
-// Turn counter property
-const TURN_COUNTER_PROPERTY = 'turnCounterProperty';
+
+const DIALOG_STATE_PROPERTY = "dialogStateProperty";
 
 export class MyBot {
-    public countProperty;
-    public conversationState;
+    public conversationState : ConversationState;
+    public dialogState : StatePropertyAccessor;
+    public dialogs : DialogSet;
   /**
    *
-   * @param {ConversationState} conversation state object
+   * @param conversationState conversation state object
    */
-  constructor(conversationState) {
+  constructor(conversationState : ConversationState) {
     // Creates a new state accessor property.
     // See https://aka.ms/about-bot-state-accessors to learn more about the bot state and state accessors.
-    this.countProperty = conversationState.createProperty(TURN_COUNTER_PROPERTY);
     this.conversationState = conversationState;
+    this.dialogState = conversationState.createProperty(DIALOG_STATE_PROPERTY);
+
+    this.dialogs = new DialogSet(this.dialogState);
+
+    // TODO add more dialogs
   }
   /**
    *
-   * @param {TurnContext} on turn context object.
+   * @param turnContext on turn context object.
    */
-  async onTurn(turnContext) {
+  async onTurn(turnContext : TurnContext) {
     // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
     if (turnContext.activity.type === ActivityTypes.Message) {
-      // read from state.
-      let count = await this.countProperty.get(turnContext);
-      count = count === undefined ? 1 : ++count;
-      await turnContext.sendActivity(`${count}: You said "${turnContext.activity.text}"`);
-      // increment and set turn counter.
-      await this.countProperty.set(turnContext, count);
+    } else if (turnContext.activity.type === ActivityTypes.ConversationUpdate) {
+        if (turnContext.activity.membersAdded.length !== 0) {
+            for(let idx in turnContext.activity.membersAdded){
+                const recipient = turnContext.activity.membersAdded[idx].id;
+                if (turnContext.activity.membersAdded[idx].id !== turnContext.activity.recipient.id) {
+                    // TODO show welcome card
+                    await turnContext.sendActivity({
+                        type : ActivityTypes.Message,
+                        text : 'Welcome! Some intro text if you are new?',
+                        locale : 'uk',
+                        suggestedActions: {
+                            to: [
+                                recipient
+                            ],
+                            actions: [
+                                {
+                                    type: ActionTypes.ImBack,
+                                    title: 'Need help',
+                                    value: ':needHelp',
+                                    channelData: {}
+                                }
+                            ]
+                        }
+                    });
+                }
+            }
+        }
+
     } else {
       await turnContext.sendActivity(`[${turnContext.activity.type} event detected]`);
     }
