@@ -1,6 +1,5 @@
 {
   "disabled": false,
-  "scriptFile": "src/index-func.ts",
   "bindings": [
     {
       "authLevel": "function",
