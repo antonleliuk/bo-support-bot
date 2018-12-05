@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import {ActionTypes, ActivityTypes, ConversationState, StatePropertyAccessor, TurnContext} from "botbuilder";
-import {DialogSet} from "botbuilder-dialogs";
+import { ActionTypes, ActivityTypes, ConversationState, StatePropertyAccessor, TurnContext } from "botbuilder";
+import { DialogSet } from "botbuilder-dialogs";
 
 
 const DIALOG_STATE_PROPERTY = "dialogStateProperty";
@@ -31,12 +31,12 @@ export class MyBot {
    */
   async onTurn(turnContext : TurnContext) {
     // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
-    if (turnContext.activity.type === ActivityTypes.Message) {
+    if (turnContext!.activity.type === ActivityTypes.Message) {
     } else if (turnContext.activity.type === ActivityTypes.ConversationUpdate) {
-        if (turnContext.activity.membersAdded.length !== 0) {
-            for(let idx in turnContext.activity.membersAdded){
-                const recipient = turnContext.activity.membersAdded[idx].id;
-                if (turnContext.activity.membersAdded[idx].id !== turnContext.activity.recipient.id) {
+        if (turnContext.activity.membersAdded!.length !== 0) {
+            for(let idx in turnContext!.activity!.membersAdded!){
+                const recipient = turnContext.activity.membersAdded![idx].id;
+                if (turnContext.activity.membersAdded![idx].id !== turnContext.activity.recipient.id) {
                     // TODO show welcome card
                     await turnContext.sendActivity({
                         type : ActivityTypes.Message,
