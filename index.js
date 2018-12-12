@@ -21,7 +21,7 @@ const botframework_config_1 = require("botframework-config");
 // This bot's main dialog.
 const bot_1 = require("./bot");
 // Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
+const ENV_FILE = path.join(__dirname, '.env');
 const env = dotenv_1.config({ path: ENV_FILE });
 // bot endpoint name as defined in .bot file
 // See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration .
@@ -37,7 +37,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log(`\nTo talk to your bot, open bo-support-bot-ts.bot file in the Emulator.`);
 });
 // .bot file path
-const BOT_FILE = path.join(__dirname, '..', (process.env.botFilePath || ''));
+const BOT_FILE = path.join(__dirname, (process.env.botFilePath || ''));
 // Read bot configuration from .bot file.
 let botConfig;
 try {

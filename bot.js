@@ -51,7 +51,7 @@ class SupportBot {
                                     ],
                                     actions: [
                                         {
-                                            type: botbuilder_1.ActionTypes.ImBack,
+                                            type: botbuilder_1.ActionTypes.PostBack,
                                             title: 'Need help',
                                             value: ':needHelp',
                                             channelData: {}

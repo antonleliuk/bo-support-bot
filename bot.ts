@@ -48,7 +48,7 @@ export class SupportBot {
                             ],
                             actions: [
                                 {
-                                    type: ActionTypes.ImBack,
+                                    type: ActionTypes.PostBack,
                                     title: 'Need help',
                                     value: ':needHelp',
                                     channelData: {}

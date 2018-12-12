@@ -16,7 +16,7 @@ import { BotConfiguration, IEndpointService } from 'botframework-config';
 import { SupportBot } from './bot';
 
 // Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
+const ENV_FILE = path.join(__dirname, '.env');
 const env = config({ path: ENV_FILE });
 
 // bot endpoint name as defined in .bot file
@@ -36,7 +36,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 
 // .bot file path
-const BOT_FILE = path.join(__dirname, '..', (process.env.botFilePath || ''));
+const BOT_FILE = path.join(__dirname, (process.env.botFilePath || ''));
 
 // Read bot configuration from .bot file.
 let botConfig;
