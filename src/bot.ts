@@ -61,7 +61,7 @@ export class SupportBot {
         }
 
     } else {
-      await turnContext.sendActivity(`[${turnContext.activity.type} event detected]`);
+      await turnContext.sendActivity(`[${turnContext.activity.type} event detected] v2`);
     }
     // Save state changes
     await this.conversationState.saveChanges(turnContext);
