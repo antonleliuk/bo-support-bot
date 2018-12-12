@@ -7,7 +7,7 @@ import { DialogSet } from "botbuilder-dialogs";
 
 const DIALOG_STATE_PROPERTY = "dialogStateProperty";
 
-export class MyBot {
+export class SupportBot {
     public conversationState : ConversationState;
     public dialogState : StatePropertyAccessor;
     public dialogs : DialogSet;
