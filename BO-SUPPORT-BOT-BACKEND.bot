@@ -1,0 +1,70 @@
+{
+  "name": "BO-SUPPORT-BOT-BACKEND",
+  "padlock": "Q0IH4zaQcyJ7fN+WdxXeJw==!/lGVDt/DkCxktY3zk2DqH5eDN3dWDUxg22dtSz3giex+a/kZZBY8k49i90zIdNYC",
+  "version": "2.0",
+  "services": [
+    {
+      "tenantId": "1330103c-bd51-4110-9b37-ad2fd1989e9e",
+      "subscriptionId": "4d3e7126-a4ce-4540-92f8-77e6bc8df4ae",
+      "resourceGroup": "BO",
+      "serviceName": "BO-SUPPORT-BOT-BACKEND",
+      "type": "abs",
+      "name": "BO-SUPPORT-BOT-BACKEND",
+      "id": "1"
+    },
+    {
+      "connectionString": "frh0R5SerDxtF+mfBJf/8A==!LUVnlkN5srsR7lbIz+0SlzeLEQmYd6Z1jjz1RudKFC2CpfdluxkXgpaudBrQvVKrl/wU2ZJkSkeR5/C73fGdR11Bifxn4/TkUKvnjnBaAPt58eLraqT2qXz+OFXiPnTO6M1CuT/hfMW4ProhVk/2+AXZWr9WYQZMoV2pf6bOuJPe6z4VojQYK0qH3uebOk5vkvTFk7QrYZ9EUP5VB541nIw0o3PofOH0QPwZtxr6p9o=",
+      "tenantId": "1330103c-bd51-4110-9b37-ad2fd1989e9e",
+      "subscriptionId": "4d3e7126-a4ce-4540-92f8-77e6bc8df4ae",
+      "resourceGroup": "BO",
+      "serviceName": "bosupportbotbackendbe10",
+      "type": "blob",
+      "id": "2"
+    },
+    {
+      "appId": "",
+      "appPassword": "",
+      "endpoint": "http://localhost:3978/api/messages",
+      "type": "endpoint",
+      "name": "development",
+      "id": "3"
+    },
+    {
+      "appId": "c5e22634-e2fc-4fb1-b873-c40562d193b2",
+      "appPassword": "iD4U/xcU8FK8iZwJr29lwA==!eKlScFBcL9sk1msMSfO4zbdkzXZNsOa62xhQ4HGH0+8=",
+      "endpoint": "https://bo-support-bot-backend.azurewebsites.net/api/messages",
+      "type": "endpoint",
+      "name": "production",
+      "id": "4"
+    },
+    {
+      "instrumentationKey": "FlXJ5GeZ0UgMZ4C+4IB4Ug==!qtzZZpJfGoOgSP9fL0pIF5E4hb577ctZV8q+yP/cK0t8m3HtZ4B1dwTNFOdh1lCb",
+      "applicationId": "af2b0ab3-94bd-403d-89d3-21e45a8f8435",
+      "apiKeys": {},
+      "tenantId": "1330103c-bd51-4110-9b37-ad2fd1989e9e",
+      "subscriptionId": "4d3e7126-a4ce-4540-92f8-77e6bc8df4ae",
+      "resourceGroup": "BO",
+      "serviceName": "BO-SUPPORT-BOT-BACKENDpuajy2",
+      "type": "appInsights",
+      "id": "5"
+    },
+    {
+      "type" : "qna",
+      "name" : "qnamakerService",
+      "endpointKey" : "fa7bc791-1adf-4e7b-8f3e-27d572cbd51e",
+      "hostname" : "https://bo-support-bot-qna.azurewebsites.net/qnamaker/",
+      "kbId" : "b2cd2b2d-1029-4d15-a796-68eda9bb873d"
+    },
+
+    {
+      "type": "luis",
+      "name": "luisService",
+      "appId": "45137845-3dfa-4cc9-ac7b-cec34a5f7a85",
+      "authoringKey": "c6f55f5041024e2ba48a5e47a994be23",
+      "subscriptionKey": "c6f55f5041024e2ba48a5e47a994be23",
+      "version": "0.1",
+      "region": "westus",
+      "id": "50"
+    }
+  ]
+}
