@@ -8,7 +8,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "node ./node_modules/typescript/lib/tsc",
-        "start": "npm run-script build && node ./lib/index.js",
+        "start": "node ./node_modules/typescript/lib/tsc && node ./lib/index.js",
         "watch": "npm run-script build && node ./lib/index.js",
         "production-build": "npm install && npm build"
     },
