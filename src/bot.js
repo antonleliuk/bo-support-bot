@@ -1,6 +1,4 @@
 "use strict";
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -12,18 +10,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const botbuilder_1 = require("botbuilder");
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
+const botbuilder_ai_1 = require("botbuilder-ai");
+const helpDialog_1 = require("./helpDialog");
 const DIALOG_STATE_PROPERTY = "dialogStateProperty";
 class SupportBot {
     /**
-     *
      * @param conversationState conversation state object
+     * @param qnaConfig QnA config
+     * @param luisApplication luis application config
      */
-    constructor(conversationState) {
+    constructor(conversationState, qnaConfig, luisApplication) {
         // Creates a new state accessor property.
         // See https://aka.ms/about-bot-state-accessors to learn more about the bot state and state accessors.
         this.conversationState = conversationState;
         this.dialogState = conversationState.createProperty(DIALOG_STATE_PROPERTY);
         this.dialogs = new botbuilder_dialogs_1.DialogSet(this.dialogState);
+        this.dialogs.add(new helpDialog_1.HelpDialog("HELP_DIALOG", qnaConfig));
+        // Create configuration for LuisRecognizer's runtime behavior.
+        const luisPredictionOptions = {
+            includeAllIntents: true,
+            log: true,
+            staging: false,
+        };
+        this.luisRecognizer = new botbuilder_ai_1.LuisRecognizer(luisApplication, luisPredictionOptions, true);
         // TODO add more dialogs
     }
     /**
@@ -34,6 +43,25 @@ class SupportBot {
         return __awaiter(this, void 0, void 0, function* () {
             // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
             if (turnContext.activity.type === botbuilder_1.ActivityTypes.Message) {
+                let dialogResult;
+                // Create a dialog context
+                const dc = yield this.dialogs.createContext(turnContext);
+                // Perform a call to LUIS to retrieve results for the user's message.
+                const results = yield this.luisRecognizer.recognize(turnContext);
+                // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
+                const topIntent = results.luisResult.topScoringIntent;
+                if (topIntent.intent === 'Help') {
+                    // await dc.beginDialog("HELP_DIALOG");
+                    yield turnContext.sendActivity(`LUIS Top Scoring Intent: ${topIntent.intent}, Score: ${topIntent.score}`);
+                }
+                else {
+                    // If the top scoring intent was "None" tell the user no valid intents were found and provide help.
+                    yield turnContext.sendActivity(`No LUIS intents were found.
+                                                \nThis sample is about identifying two user intents:
+                                                \n - 'Calendar.Add'
+                                                \n - 'Calendar.Find'
+                                                \nTry typing 'Add event' or 'Show me tomorrow'.`);
+                }
             }
             else if (turnContext.activity.type === botbuilder_1.ActivityTypes.ConversationUpdate) {
                 if (turnContext.activity.membersAdded.length !== 0) {
@@ -52,8 +80,8 @@ class SupportBot {
                                     actions: [
                                         {
                                             type: botbuilder_1.ActionTypes.PostBack,
-                                            title: 'Need help',
-                                            value: ':needHelp',
+                                            title: 'Помощь',
+                                            value: 'help',
                                             channelData: {}
                                         }
                                     ]
@@ -64,7 +92,7 @@ class SupportBot {
                 }
             }
             else {
-                yield turnContext.sendActivity(`[${turnContext.activity.type} event detected] v2`);
+                yield turnContext.sendActivity(`[${turnContext.activity.type} event detected]`);
             }
             // Save state changes
             yield this.conversationState.saveChanges(turnContext);

@@ -3,20 +3,19 @@
 
 import * as restify from 'restify';
 import * as path from 'path';
-import { config } from 'dotenv';
-
+import {config} from 'dotenv';
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-import { BotFrameworkAdapter, MemoryStorage, ConversationState } from 'botbuilder';
-
+import {BotFrameworkAdapter, ConversationState, MemoryStorage} from 'botbuilder';
 // Import required bot configuration.
-import { BotConfiguration, IEndpointService } from 'botframework-config';
-
+import {BotConfiguration, IEndpointService, IQnAService, LuisService} from 'botframework-config';
 // This bot's main dialog.
-import { SupportBot } from './bot';
+import {SupportBot} from './bot';
+
+import {LuisApplication, QnAMakerEndpoint,} from "botbuilder-ai";
 
 // Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '.env');
+const ENV_FILE = path.join(__dirname, '..', '.env');
 const env = config({ path: ENV_FILE });
 
 // bot endpoint name as defined in .bot file
@@ -27,8 +26,13 @@ const DEV_ENVIRONMENT = 'development';
 // See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration.
 const BOT_CONFIGURATION = (process.env.NODE_ENV || DEV_ENVIRONMENT);
 
+const QNA_CONFIGURATION = 'qnamakerService';
+
+const LUIS_CONFIGURATION = 'luisService';
+
 // Create HTTP server.
 let server = restify.createServer();
+
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log(`\n${server.name} listening to ${server.url}`);
     console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator`);
@@ -50,7 +54,11 @@ try {
 }
 
 // Get bot endpoint configuration by service name
-const endpointConfig = <IEndpointService>botConfig.findServiceByNameOrId(BOT_CONFIGURATION);
+const endpointConfig = botConfig.findServiceByNameOrId(BOT_CONFIGURATION) as IEndpointService;
+
+const qnaConfig = botConfig.findServiceByNameOrId(QNA_CONFIGURATION) as IQnAService;
+
+const luisConfig = botConfig.findServiceByNameOrId(LUIS_CONFIGURATION) as LuisService;
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about .bot file its use and bot configuration .
@@ -59,6 +67,22 @@ const adapter = new BotFrameworkAdapter({
     appPassword: endpointConfig.appPassword || process.env.microsoftAppPassword
 });
 
+// Map the contents to the required format for QnAMaker.
+const qnaEndpointSettings: QnAMakerEndpoint = {
+    endpointKey: qnaConfig.endpointKey,
+    host: qnaConfig.hostname,
+    knowledgeBaseId: qnaConfig.kbId,
+};
+
+// Map the contents to the required format for `LuisRecognizer`.
+console.log("======");
+console.log(luisConfig.getEndpoint());
+console.log("======");
+const luisApplication: LuisApplication = {
+    applicationId: luisConfig.appId,
+    endpoint: luisConfig.getEndpoint(),
+    endpointKey: luisConfig.subscriptionKey,
+};
 // Define a state store for your bot.
 // See https://aka.ms/about-bot-state to learn more about using MemoryStorage.
 // A bot requires a state store to persist the dialog and user state between messages.
@@ -82,7 +106,7 @@ const memoryStorage = new MemoryStorage();
 const conversationState = new ConversationState(memoryStorage);
 
 // Create the main dialog.
-const myBot = new SupportBot(conversationState);
+const myBot = new SupportBot(conversationState, qnaEndpointSettings, luisApplication);
 
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {

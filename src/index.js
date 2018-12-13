@@ -21,7 +21,7 @@ const botframework_config_1 = require("botframework-config");
 // This bot's main dialog.
 const bot_1 = require("./bot");
 // Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '.env');
+const ENV_FILE = path.join(__dirname, '..', '.env');
 const env = dotenv_1.config({ path: ENV_FILE });
 // bot endpoint name as defined in .bot file
 // See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration .
@@ -29,6 +29,8 @@ const DEV_ENVIRONMENT = 'development';
 // bot name as defined in .bot file
 // See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration.
 const BOT_CONFIGURATION = (process.env.NODE_ENV || DEV_ENVIRONMENT);
+const QNA_CONFIGURATION = 'qnamakerService';
+const LUIS_CONFIGURATION = 'luisService';
 // Create HTTP server.
 let server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -51,12 +53,29 @@ catch (err) {
 }
 // Get bot endpoint configuration by service name
 const endpointConfig = botConfig.findServiceByNameOrId(BOT_CONFIGURATION);
+const qnaConfig = botConfig.findServiceByNameOrId(QNA_CONFIGURATION);
+const luisConfig = botConfig.findServiceByNameOrId(LUIS_CONFIGURATION);
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about .bot file its use and bot configuration .
 const adapter = new botbuilder_1.BotFrameworkAdapter({
     appId: endpointConfig.appId || process.env.microsoftAppID,
     appPassword: endpointConfig.appPassword || process.env.microsoftAppPassword
 });
+// Map the contents to the required format for QnAMaker.
+const qnaEndpointSettings = {
+    endpointKey: qnaConfig.endpointKey,
+    host: qnaConfig.hostname,
+    knowledgeBaseId: qnaConfig.kbId,
+};
+// Map the contents to the required format for `LuisRecognizer`.
+console.log("======");
+console.log(luisConfig.getEndpoint());
+console.log("======");
+const luisApplication = {
+    applicationId: luisConfig.appId,
+    endpoint: luisConfig.getEndpoint(),
+    endpointKey: luisConfig.subscriptionKey,
+};
 // Define a state store for your bot.
 // See https://aka.ms/about-bot-state to learn more about using MemoryStorage.
 // A bot requires a state store to persist the dialog and user state between messages.
@@ -78,7 +97,7 @@ const memoryStorage = new botbuilder_1.MemoryStorage();
 // Create conversation state with in-memory storage provider.
 const conversationState = new botbuilder_1.ConversationState(memoryStorage);
 // Create the main dialog.
-const myBot = new bot_1.SupportBot(conversationState);
+const myBot = new bot_1.SupportBot(conversationState, qnaEndpointSettings, luisApplication);
 // Catch-all for errors.
 adapter.onTurnError = (context, error) => __awaiter(this, void 0, void 0, function* () {
     // This check writes out errors to console log .vs. app insights.

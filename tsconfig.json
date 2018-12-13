@@ -7,9 +7,10 @@
     "experimentalDecorators": true,
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,
-    "strict": true
+    "strict": true,
+    "resolveJsonModule": true
   },
   "include": [
-    "*.ts"
+    "./src/*.ts"
   ]
 }
