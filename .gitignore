@@ -5,6 +5,8 @@ csx
 edge
 Publish
 
+lib
+
 *.user
 *.suo
 *.cscfg

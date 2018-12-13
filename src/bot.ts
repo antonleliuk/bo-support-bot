@@ -2,19 +2,12 @@ import {
     ActionTypes,
     ActivityTypes,
     ConversationState,
+    RecognizerResult,
     StatePropertyAccessor,
-    TurnContext,
-    RecognizerResult
+    TurnContext
 } from "botbuilder";
-import {DialogSet, DialogTurnResult} from "botbuilder-dialogs";
-import {
-    LuisApplication,
-    LuisPredictionOptions,
-    LuisRecognizer,
-    QnAMaker,
-    QnAMakerEndpoint,
-    QnAMakerResult
-} from "botbuilder-ai";
+import {DialogSet, DialogTurnResult, DialogTurnStatus} from "botbuilder-dialogs";
+import {LuisApplication, LuisPredictionOptions, LuisRecognizer, QnAMakerEndpoint} from "botbuilder-ai";
 import {HelpDialog} from "./helpDialog";
 
 const DIALOG_STATE_PROPERTY = "dialogStateProperty";
@@ -68,27 +61,34 @@ export class SupportBot {
             // Create a dialog context
             const dc = await this.dialogs.createContext(turnContext);
 
+            dialogResult = await dc.continueDialog();
 
-            // Perform a call to LUIS to retrieve results for the user's message.
-            const results: RecognizerResult = await this.luisRecognizer.recognize(turnContext);
+            if(!dc.context.responded){
+                switch (dialogResult.status) {
+                    case DialogTurnStatus.empty:
+                        // Perform a call to LUIS to retrieve results for the user's message.
+                        const results: RecognizerResult = await this.luisRecognizer.recognize(turnContext);
 
-            // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
-            const topIntent = results.luisResult.topScoringIntent;
+                        // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
+                        const topIntent = results.luisResult.topScoringIntent;
 
-            if (topIntent.intent === 'Help') {
-                // await dc.beginDialog("HELP_DIALOG");
-                await turnContext.sendActivity(`LUIS Top Scoring Intent: ${ topIntent.intent }, Score: ${ topIntent.score }`);
-            } else {
-                // If the top scoring intent was "None" tell the user no valid intents were found and provide help.
-                await turnContext.sendActivity(`No LUIS intents were found.
+                        if (topIntent.intent === 'Help') {
+                            await dc.beginDialog("HELP_DIALOG");
+                            // await turnContext.sendActivity(`LUIS Top Scoring Intent: ${ topIntent.intent }, Score: ${ topIntent.score }`);
+                        } else {
+                            // If the top scoring intent was "None" tell the user no valid intents were found and provide help.
+                            await turnContext.sendActivity(`No LUIS intents were found.
                                                 \nThis sample is about identifying two user intents:
                                                 \n - 'Calendar.Add'
                                                 \n - 'Calendar.Find'
                                                 \nTry typing 'Add event' or 'Show me tomorrow'.`);
+                        }
+                        break;
+                    default:
+                        await turnContext.sendActivity("Please type Help.");
+                        break;
+                }
             }
-
-
-
         } else if (turnContext.activity.type === ActivityTypes.ConversationUpdate) {
 
             if (turnContext.activity.membersAdded!.length !== 0) {
