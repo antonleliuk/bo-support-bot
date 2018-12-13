@@ -32,7 +32,7 @@
         {
             "type": "endpoint",
             "appId": "c5e22634-e2fc-4fb1-b873-c40562d193b2",
-            "appPassword": "iD4U/xcU8FK8iZwJr29lwA==!eKlScFBcL9sk1msMSfO4zbdkzXZNsOa62xhQ4HGH0+8=",
+            "appPassword": "",
             "endpoint": "https://bo-support-bot-backend.azurewebsites.net/api/messages",
             "name": "production",
             "id": "4"
