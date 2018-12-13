@@ -10,12 +10,12 @@ import {BotFrameworkAdapter, ConversationState, MemoryStorage} from 'botbuilder'
 // Import required bot configuration.
 import {BotConfiguration, IEndpointService, IQnAService, LuisService} from 'botframework-config';
 // This bot's main dialog.
-import {SupportBot} from './bot';
+import {SupportBot} from './src/bot';
 
 import {LuisApplication, QnAMakerEndpoint,} from "botbuilder-ai";
 
 // Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
+const ENV_FILE = path.join(__dirname, '.env');
 const env = config({ path: ENV_FILE });
 
 // bot endpoint name as defined in .bot file

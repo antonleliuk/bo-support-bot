@@ -19,9 +19,9 @@ const botbuilder_1 = require("botbuilder");
 // Import required bot configuration.
 const botframework_config_1 = require("botframework-config");
 // This bot's main dialog.
-const bot_1 = require("./bot");
+const bot_1 = require("./src/bot");
 // Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
+const ENV_FILE = path.join(__dirname, '.env');
 const env = dotenv_1.config({ path: ENV_FILE });
 // bot endpoint name as defined in .bot file
 // See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration .

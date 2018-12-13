@@ -8,10 +8,9 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,
     "strict": true,
-    "resolveJsonModule": true,
-    "outDir": "./lib"
+    "resolveJsonModule": true
   },
   "include": [
-    "./src/*.ts"
+    "*.ts"
   ]
 }
