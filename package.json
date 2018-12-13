@@ -7,9 +7,9 @@
     "main": "./lib/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "node ./node_modules/typescript/lib/tsc",
-        "start": "node ./node_modules/typescript/lib/tsc && node ./lib/index.js",
-        "watch": "npm run-script build && node ./lib/index.js",
+        "build": "node_modules/.bin/tsc --build",
+        "start": "node_modules/.bin/tsc --build && node ./lib/index.js",
+        "watch": "node_modules/.bin/nodemon --watch ./src -e ts --exec \"npm run start\"",
         "production-build": "npm install && npm build"
     },
     "dependencies": {
