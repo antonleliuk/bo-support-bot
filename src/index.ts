@@ -75,9 +75,6 @@ const qnaEndpointSettings: QnAMakerEndpoint = {
 };
 
 // Map the contents to the required format for `LuisRecognizer`.
-console.log("======");
-console.log(luisConfig.getEndpoint());
-console.log("======");
 const luisApplication: LuisApplication = {
     applicationId: luisConfig.appId,
     endpoint: luisConfig.getEndpoint(),
