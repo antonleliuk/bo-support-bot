@@ -99,6 +99,7 @@ call :SelectNodeVersion
 
 :: 3. Install npm packages
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
+  echo "%DEPLOYMENT_TARGET%\package.json"
   pushd "%DEPLOYMENT_TARGET%"
   call :ExecuteCmd !NPM_CMD! production-build --production
   IF !ERRORLEVEL! NEQ 0 goto error
