@@ -1,5 +1,5 @@
 {
-    "name": "boSupportBot",
+    "name": "BO-SUPPORT-BOT-BACKEND",
     "services": [
         {
             "type": "endpoint",

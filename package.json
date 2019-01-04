@@ -4,12 +4,17 @@
     "description": "Provide help for the customers",
     "author": "Anton Leliuk",
     "license": "MIT",
-    "main": "./src/index.js",
+    "main": "index.js",
+    "engines": {
+        "node": "8.11.1",
+        "npm": "6.4.1"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc",
-        "start": "tsc && node ./src/index.js",
-        "watch": "tsc && node ./src/index.js"
+        "build": "node_modules/.bin/tsc --build",
+        "prestart": "node_modules/.bin/tsc --build",
+        "start": "node index.js",
+        "production-build": "npm install && npm build"
     },
     "dependencies": {
         "@types/dotenv": "6.1.0",
@@ -19,7 +24,8 @@
         "botbuilder-dialogs": "4.2.0",
         "botframework-config": "4.2.0",
         "dotenv": "6.0.0",
-        "restify": "6.3.4"
+        "restify": "6.3.4",
+        "typescript": "3.2.2"
     },
     "devDependencies": {
         "@types/node": "10.10.2",
