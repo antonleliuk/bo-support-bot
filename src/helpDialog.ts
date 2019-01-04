@@ -1,4 +1,4 @@
-import {ComponentDialog, WaterfallDialog, WaterfallStepContext} from "botbuilder-dialogs";
+import {ComponentDialog, TextPrompt, WaterfallDialog, WaterfallStepContext} from "botbuilder-dialogs";
 import {QnAMaker, QnAMakerEndpoint, QnAMakerResult} from "botbuilder-ai";
 
 export class HelpDialog extends ComponentDialog {
@@ -10,14 +10,16 @@ export class HelpDialog extends ComponentDialog {
 
         this.qnaMaker = new QnAMaker(qnaConfig, {top: 1, scoreThreshold: 0.5});
 
-        this.addDialog(new WaterfallDialog("HELP_DIALOG_ID", [
+        this.addDialog(new WaterfallDialog("QUESTION_DIALOG", [
             this.askQuestionForHelp.bind(this),
             this.displayHelpResults.bind(this)
         ]))
+
+        this.addDialog(new TextPrompt("QUESTION_DIALOG_ID"))
     }
 
     async askQuestionForHelp(step : WaterfallStepContext){
-        return await step.prompt("HELP_DIALOG", 'Ask question');
+        return await step.prompt("QUESTION_DIALOG_ID", 'Ask question');
     }
 
     async displayHelpResults(step: WaterfallStepContext){

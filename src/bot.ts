@@ -2,22 +2,15 @@ import {
     ActionTypes,
     ActivityTypes,
     ConversationState,
+    RecognizerResult,
     StatePropertyAccessor,
-    TurnContext,
-    RecognizerResult
-} from "botbuilder";
-import {DialogSet, DialogTurnResult} from "botbuilder-dialogs";
-import {
-    LuisApplication,
-    LuisPredictionOptions,
-    LuisRecognizer,
-    QnAMaker,
-    QnAMakerEndpoint,
-    QnAMakerResult
-} from "botbuilder-ai";
-import {HelpDialog} from "./helpDialog";
+    TurnContext
+} from 'botbuilder';
+import {DialogSet, DialogTurnResult, DialogTurnStatus} from 'botbuilder-dialogs';
+import {LuisApplication, LuisPredictionOptions, LuisRecognizer, QnAMakerEndpoint} from 'botbuilder-ai';
+import {HelpDialog} from './helpDialog';
 
-const DIALOG_STATE_PROPERTY = "dialogStateProperty";
+const DIALOG_STATE_PROPERTY = 'dialogStateProperty';
 
 export class SupportBot {
     private conversationState: ConversationState;
@@ -39,7 +32,7 @@ export class SupportBot {
 
         this.dialogs = new DialogSet(this.dialogState);
 
-        this.dialogs.add(new HelpDialog("HELP_DIALOG", qnaConfig));
+        this.dialogs.add(new HelpDialog('HELP_DIALOG', qnaConfig));
 
 
 
@@ -61,33 +54,68 @@ export class SupportBot {
      */
     async onTurn(turnContext: TurnContext) {
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
-        if (turnContext!.activity.type === ActivityTypes.Message) {
+        if (turnContext!.activity.type === ActivityTypes.Event) {
+            let dialogResult: DialogTurnResult;
+
+            // Create a dialog context
+            const dc = await this.dialogs.createContext(turnContext);
+
+            dialogResult = await dc.continueDialog()
+
+            if(!dc.context.responded){
+                switch (dialogResult.status) {
+                    case DialogTurnStatus.empty:
+                        await dc.beginDialog('HELP_DIALOG')
+                        break;
+                    case DialogTurnStatus.waiting:
+                        // The active dialog is waiting for a response from the user, so do nothing
+                        break;
+                    case DialogTurnStatus.complete:
+                        await dc.endDialog();
+                        break;
+                    default:
+                        await dc.cancelAllDialogs();
+                        break;
+                }
+            }
+        } else if (turnContext!.activity.type === ActivityTypes.Message) {
 
             let dialogResult: DialogTurnResult;
 
             // Create a dialog context
             const dc = await this.dialogs.createContext(turnContext);
 
+            dialogResult = await dc.continueDialog()
 
-            // Perform a call to LUIS to retrieve results for the user's message.
-            const results: RecognizerResult = await this.luisRecognizer.recognize(turnContext);
+            if(!dc.context.responded){
+                switch (dialogResult.status) {
+                    case DialogTurnStatus.empty:
+                        // Perform a call to LUIS to retrieve results for the user's message.
+                        const results: RecognizerResult = await this.luisRecognizer.recognize(turnContext);
 
-            // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
-            const topIntent = results.luisResult.topScoringIntent;
+                        // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
+                        const topIntent = results.luisResult.topScoringIntent;
 
-            if (topIntent.intent === 'Help') {
-                // await dc.beginDialog("HELP_DIALOG");
-                await turnContext.sendActivity(`LUIS Top Scoring Intent: ${ topIntent.intent }, Score: ${ topIntent.score }`);
-            } else {
-                // If the top scoring intent was "None" tell the user no valid intents were found and provide help.
-                await turnContext.sendActivity(`No LUIS intents were found.
-                                                \nThis sample is about identifying two user intents:
-                                                \n - 'Calendar.Add'
-                                                \n - 'Calendar.Find'
-                                                \nTry typing 'Add event' or 'Show me tomorrow'.`);
+                        if (topIntent.intent === 'Help') {
+                            await dc.beginDialog('HELP_DIALOG')
+                            // await turnContext.sendActivity(`LUIS Top Scoring Intent: ${ topIntent.intent }, Score: ${ topIntent.score }`);
+                        } else {
+                            await dc.cancelAllDialogs()
+                            // If the top scoring intent was 'None' tell the user no valid intents were found and provide help.
+                            await turnContext.sendActivity('Sorry I can\'t understand. Show some help');
+                        }
+                        break;
+                    case DialogTurnStatus.waiting:
+                        // The active dialog is waiting for a response from the user, so do nothing
+                        break;
+                    case DialogTurnStatus.complete:
+                        await dc.endDialog();
+                        break;
+                    default:
+                        await dc.cancelAllDialogs();
+                        break;
+                }
             }
-
-
 
         } else if (turnContext.activity.type === ActivityTypes.ConversationUpdate) {
 
@@ -99,7 +127,7 @@ export class SupportBot {
                         // TODO show welcome card
                         await turnContext.sendActivity({
                             type: ActivityTypes.Message,
-                            text: 'Welcome! Some intro text if you are new?',
+                            text: 'Welcome! Show some helpful text',
                             locale: 'uk',
                             suggestedActions: {
                                 to: [

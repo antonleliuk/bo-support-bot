@@ -14,14 +14,15 @@ class HelpDialog extends botbuilder_dialogs_1.ComponentDialog {
     constructor(dialogId, qnaConfig) {
         super(dialogId);
         this.qnaMaker = new botbuilder_ai_1.QnAMaker(qnaConfig, { top: 1, scoreThreshold: 0.5 });
-        this.addDialog(new botbuilder_dialogs_1.WaterfallDialog(dialogId, [
+        this.addDialog(new botbuilder_dialogs_1.WaterfallDialog("QUESTION_DIALOG", [
             this.askQuestionForHelp.bind(this),
             this.displayHelpResults.bind(this)
         ]));
+        this.addDialog(new botbuilder_dialogs_1.TextPrompt("QUESTION_DIALOG_ID"));
     }
     askQuestionForHelp(step) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield step.prompt("HELP_DIALOG", 'Ask question');
+            return yield step.prompt("QUESTION_DIALOG_ID", 'Ask question');
         });
     }
     displayHelpResults(step) {

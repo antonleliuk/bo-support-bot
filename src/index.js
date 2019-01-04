@@ -68,9 +68,6 @@ const qnaEndpointSettings = {
     knowledgeBaseId: qnaConfig.kbId,
 };
 // Map the contents to the required format for `LuisRecognizer`.
-console.log("======");
-console.log(luisConfig.getEndpoint());
-console.log("======");
 const luisApplication = {
     applicationId: luisConfig.appId,
     endpoint: luisConfig.getEndpoint(),

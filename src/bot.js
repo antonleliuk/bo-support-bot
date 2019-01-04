@@ -12,7 +12,7 @@ const botbuilder_1 = require("botbuilder");
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
 const botbuilder_ai_1 = require("botbuilder-ai");
 const helpDialog_1 = require("./helpDialog");
-const DIALOG_STATE_PROPERTY = "dialogStateProperty";
+const DIALOG_STATE_PROPERTY = 'dialogStateProperty';
 class SupportBot {
     /**
      * @param conversationState conversation state object
@@ -25,7 +25,7 @@ class SupportBot {
         this.conversationState = conversationState;
         this.dialogState = conversationState.createProperty(DIALOG_STATE_PROPERTY);
         this.dialogs = new botbuilder_dialogs_1.DialogSet(this.dialogState);
-        this.dialogs.add(new helpDialog_1.HelpDialog("HELP_DIALOG", qnaConfig));
+        this.dialogs.add(new helpDialog_1.HelpDialog('HELP_DIALOG', qnaConfig));
         // Create configuration for LuisRecognizer's runtime behavior.
         const luisPredictionOptions = {
             includeAllIntents: true,
@@ -46,21 +46,38 @@ class SupportBot {
                 let dialogResult;
                 // Create a dialog context
                 const dc = yield this.dialogs.createContext(turnContext);
-                // Perform a call to LUIS to retrieve results for the user's message.
-                const results = yield this.luisRecognizer.recognize(turnContext);
-                // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
-                const topIntent = results.luisResult.topScoringIntent;
-                if (topIntent.intent === 'Help') {
-                    // await dc.beginDialog("HELP_DIALOG");
-                    yield turnContext.sendActivity(`LUIS Top Scoring Intent: ${topIntent.intent}, Score: ${topIntent.score}`);
-                }
-                else {
-                    // If the top scoring intent was "None" tell the user no valid intents were found and provide help.
-                    yield turnContext.sendActivity(`No LUIS intents were found.
+                dialogResult = yield dc.continueDialog();
+                if (!dc.context.responded) {
+                    switch (dialogResult.status) {
+                        case botbuilder_dialogs_1.DialogTurnStatus.empty:
+                            // Perform a call to LUIS to retrieve results for the user's message.
+                            const results = yield this.luisRecognizer.recognize(turnContext);
+                            // Since the LuisRecognizer was configured to include the raw results, get the `topScoringIntent` as specified by LUIS.
+                            const topIntent = results.luisResult.topScoringIntent;
+                            if (topIntent.intent === 'Help') {
+                                yield dc.beginDialog('HELP_DIALOG');
+                                // await turnContext.sendActivity(`LUIS Top Scoring Intent: ${ topIntent.intent }, Score: ${ topIntent.score }`);
+                            }
+                            else {
+                                yield dc.cancelAllDialogs();
+                                // If the top scoring intent was 'None' tell the user no valid intents were found and provide help.
+                                yield turnContext.sendActivity(`No LUIS intents were found.
                                                 \nThis sample is about identifying two user intents:
                                                 \n - 'Calendar.Add'
                                                 \n - 'Calendar.Find'
                                                 \nTry typing 'Add event' or 'Show me tomorrow'.`);
+                            }
+                            break;
+                        case botbuilder_dialogs_1.DialogTurnStatus.waiting:
+                            // The active dialog is waiting for a response from the user, so do nothing
+                            break;
+                        case botbuilder_dialogs_1.DialogTurnStatus.complete:
+                            yield dc.endDialog();
+                            break;
+                        default:
+                            yield dc.cancelAllDialogs();
+                            break;
+                    }
                 }
             }
             else if (turnContext.activity.type === botbuilder_1.ActivityTypes.ConversationUpdate) {
