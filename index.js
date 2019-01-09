@@ -90,7 +90,7 @@ const DEFAULT_BOT_CONTAINER = 'bo-support-container';
 const blobStorageConfig = botConfig.findServiceByNameOrId(STORAGE_CONFIGURATION_ID);
 const blobStorage = new botbuilder_azure_1.BlobStorage({
     containerName: (blobStorageConfig.container || DEFAULT_BOT_CONTAINER),
-    storageAccountOrConnectionString: blobStorageConfig.connectionString
+    storageAccountOrConnectionString: blobStorageConfig.connectionString || process.env.microsoftBlobStorageConnection
 });
 // conversationState = new ConversationState(blobStorage);
 // Create conversation state with in-memory storage provider.

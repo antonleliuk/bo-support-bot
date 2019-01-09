@@ -32,7 +32,7 @@
         {
             "type": "blob",
             "name" : "storageService",
-            "connectionString": "DefaultEndpointsProtocol=https;AccountName=bosupportbotbackendbe10;AccountKey=KoV6fAQBT5lIH5Xm1zlQ/BQJ6dc4KfJhzmixB/EtFATQOC+XKxHTuuwCko7/1c2rRgt6BGoeNbm+KklQl07mHg==;EndpointSuffix=core.windows.net",
+            "connectionString": "",
             "tenantId": "1330103c-bd51-4110-9b37-ad2fd1989e9e",
             "subscriptionId": "4d3e7126-a4ce-4540-92f8-77e6bc8df4ae",
             "resourceGroup": "BO",
