@@ -13,16 +13,28 @@ const botbuilder_ai_1 = require("botbuilder-ai");
 class HelpDialog extends botbuilder_dialogs_1.ComponentDialog {
     constructor(dialogId, qnaConfig) {
         super(dialogId);
+        this.NAME_LENGTH_MIN = 5;
+        this.validateName = (validatorContext) => __awaiter(this, void 0, void 0, function* () {
+            // Validate that the user entered a minimum lenght for their name
+            const value = (validatorContext.recognized.value || '').trim();
+            if (value.length >= this.NAME_LENGTH_MIN) {
+                return true;
+            }
+            else {
+                yield validatorContext.context.sendActivity(`Names need to be at least ${this.NAME_LENGTH_MIN} characters long.`);
+                return false;
+            }
+        });
         this.qnaMaker = new botbuilder_ai_1.QnAMaker(qnaConfig, { top: 1, scoreThreshold: 0.5 });
         this.addDialog(new botbuilder_dialogs_1.WaterfallDialog("QUESTION_DIALOG", [
             this.askQuestionForHelp.bind(this),
             this.displayHelpResults.bind(this)
         ]));
-        this.addDialog(new botbuilder_dialogs_1.TextPrompt("QUESTION_DIALOG_ID"));
+        this.addDialog(new botbuilder_dialogs_1.TextPrompt("QUESTION_PROMPT", this.validateName));
     }
     askQuestionForHelp(step) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield step.prompt("QUESTION_DIALOG_ID", 'Ask question');
+            return yield step.prompt("QUESTION_PROMPT", 'Ask question');
         });
     }
     displayHelpResults(step) {
@@ -40,5 +52,6 @@ class HelpDialog extends botbuilder_dialogs_1.ComponentDialog {
             return step.endDialog();
         });
     }
+    ;
 }
 exports.HelpDialog = HelpDialog;

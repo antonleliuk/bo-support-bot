@@ -1,4 +1,4 @@
-import {ComponentDialog, TextPrompt, WaterfallDialog, WaterfallStepContext} from "botbuilder-dialogs";
+import {ComponentDialog, TextPrompt, WaterfallDialog, WaterfallStepContext, PromptValidatorContext} from "botbuilder-dialogs";
 import {QnAMaker, QnAMakerEndpoint, QnAMakerResult} from "botbuilder-ai";
 
 import {HelpState} from "./helpState";
@@ -12,7 +12,7 @@ export class HelpDialog extends ComponentDialog {
 
         this.qnaMaker = new QnAMaker(qnaConfig, {top: 1, scoreThreshold: 0.5});
 
-        this.addDialog(new WaterfallDialog("QUESTION_DIALOG", [
+        this.addDialog(new WaterfallDialog<HelpState>("QUESTION_DIALOG", [
             this.askQuestionForHelp.bind(this),
             this.displayHelpResults.bind(this)
         ]))
@@ -20,12 +20,12 @@ export class HelpDialog extends ComponentDialog {
         this.addDialog(new TextPrompt("QUESTION_PROMPT", this.validateName));
     }
 
-    async askQuestionForHelp(step : WaterfallStepContext){
+    async askQuestionForHelp(step : WaterfallStepContext<HelpState>){
         return await step.prompt("QUESTION_PROMPT", 'Ask question');
 
     }
 
-    async displayHelpResults(step: WaterfallStepContext){
+    async displayHelpResults(step: WaterfallStepContext<HelpState>){
         // Perform a call to the QnA Maker service to retrieve matching Question and Answer pairs.
         const qnaResults: QnAMakerResult[] = await this.qnaMaker.getAnswers(step.context);
 

@@ -42,7 +42,29 @@ class SupportBot {
     onTurn(turnContext) {
         return __awaiter(this, void 0, void 0, function* () {
             // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
-            if (turnContext.activity.type === botbuilder_1.ActivityTypes.Message) {
+            if (turnContext.activity.type === botbuilder_1.ActivityTypes.Event) {
+                let dialogResult;
+                // Create a dialog context
+                const dc = yield this.dialogs.createContext(turnContext);
+                dialogResult = yield dc.continueDialog();
+                if (!dc.context.responded) {
+                    switch (dialogResult.status) {
+                        case botbuilder_dialogs_1.DialogTurnStatus.empty:
+                            yield dc.beginDialog('HELP_DIALOG');
+                            break;
+                        case botbuilder_dialogs_1.DialogTurnStatus.waiting:
+                            // The active dialog is waiting for a response from the user, so do nothing
+                            break;
+                        case botbuilder_dialogs_1.DialogTurnStatus.complete:
+                            yield dc.endDialog();
+                            break;
+                        default:
+                            yield dc.cancelAllDialogs();
+                            break;
+                    }
+                }
+            }
+            else if (turnContext.activity.type === botbuilder_1.ActivityTypes.Message) {
                 let dialogResult;
                 // Create a dialog context
                 const dc = yield this.dialogs.createContext(turnContext);
@@ -61,11 +83,23 @@ class SupportBot {
                             else {
                                 yield dc.cancelAllDialogs();
                                 // If the top scoring intent was 'None' tell the user no valid intents were found and provide help.
-                                yield turnContext.sendActivity(`No LUIS intents were found.
-                                                \nThis sample is about identifying two user intents:
-                                                \n - 'Calendar.Add'
-                                                \n - 'Calendar.Find'
-                                                \nTry typing 'Add event' or 'Show me tomorrow'.`);
+                                yield turnContext.sendActivity({
+                                    type: botbuilder_1.ActivityTypes.Message,
+                                    text: 'Sorry I can\'t understand. Show some help',
+                                    suggestedActions: {
+                                        to: [
+                                            turnContext.activity.from.id
+                                        ],
+                                        actions: [
+                                            {
+                                                type: botbuilder_1.ActionTypes.PostBack,
+                                                title: 'Помощь',
+                                                value: 'help',
+                                                channelData: {}
+                                            }
+                                        ]
+                                    }
+                                });
                             }
                             break;
                         case botbuilder_dialogs_1.DialogTurnStatus.waiting:
@@ -88,7 +122,7 @@ class SupportBot {
                             // TODO show welcome card
                             yield turnContext.sendActivity({
                                 type: botbuilder_1.ActivityTypes.Message,
-                                text: 'Welcome! Some intro text if you are new?',
+                                text: 'Welcome! Show some helpful text',
                                 locale: 'uk',
                                 suggestedActions: {
                                     to: [

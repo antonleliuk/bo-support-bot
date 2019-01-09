@@ -8,11 +8,13 @@ import {config} from 'dotenv';
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {BotFrameworkAdapter, ConversationState, MemoryStorage} from 'botbuilder';
 // Import required bot configuration.
-import {BotConfiguration, IEndpointService, IQnAService, LuisService} from 'botframework-config';
+import {BotConfiguration, IEndpointService, IQnAService, LuisService, BlobStorageService} from 'botframework-config';
 // This bot's main dialog.
 import {SupportBot} from './src/bot';
 
-import {LuisApplication, QnAMakerEndpoint,} from "botbuilder-ai";
+import {LuisApplication, QnAMakerEndpoint,} from 'botbuilder-ai';
+
+import { BlobStorage, BlobStorageSettings } from 'botbuilder-azure'
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '.env');
@@ -84,24 +86,24 @@ const luisApplication: LuisApplication = {
 // Define a state store for your bot.
 // See https://aka.ms/about-bot-state to learn more about using MemoryStorage.
 // A bot requires a state store to persist the dialog and user state between messages.
-const memoryStorage = new MemoryStorage();
+// const memoryStorage = new MemoryStorage();
 // CAUTION: You must ensure your product environment has the NODE_ENV set
 //          to use the Azure Blob storage or Azure Cosmos DB providers.
 // const { BlobStorage } = require('botbuilder-azure');
 // Storage configuration name or ID from .bot file
-// const STORAGE_CONFIGURATION_ID = '<STORAGE-NAME-OR-ID-FROM-BOT-FILE>';
+const STORAGE_CONFIGURATION_ID = 'storageService';
 // // Default container name
-// const DEFAULT_BOT_CONTAINER = '<DEFAULT-CONTAINER>';
+const DEFAULT_BOT_CONTAINER = 'bo-support-container';
 // // Get service configuration
-// const blobStorageConfig = botConfig.findServiceByNameOrId(STORAGE_CONFIGURATION_ID);
-// const blobStorage = new BlobStorage({
-//     containerName: (blobStorageConfig.container || DEFAULT_BOT_CONTAINER),
-//     storageAccountOrConnectionString: blobStorageConfig.connectionString,
-// });
+const blobStorageConfig = botConfig.findServiceByNameOrId(STORAGE_CONFIGURATION_ID) as BlobStorageService;
+const blobStorage = new BlobStorage({
+    containerName: (blobStorageConfig.container || DEFAULT_BOT_CONTAINER),
+    storageAccountOrConnectionString: blobStorageConfig.connectionString
+});
 // conversationState = new ConversationState(blobStorage);
 
 // Create conversation state with in-memory storage provider.
-const conversationState = new ConversationState(memoryStorage);
+const conversationState = new ConversationState(blobStorage);
 
 // Create the main dialog.
 const myBot = new SupportBot(conversationState, qnaEndpointSettings, luisApplication);
@@ -111,7 +113,7 @@ adapter.onTurnError = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
     console.error(`\n [onTurnError]: ${error}`);
     // Send a message to the user
-    context.sendActivity(`Oops. Something went wrong!`);
+    await context.sendActivity(`Oops. Something went wrong!`);
     // Clear out state
     await conversationState.load(context);
     await conversationState.clear(context);

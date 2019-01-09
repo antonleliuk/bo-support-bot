@@ -11,12 +11,13 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "node_modules/.bin/tsc --build",
-        "prestart": "node_modules/.bin/tsc --build",
+        "build": "node_modules/.bin/tsc",
+        "prestart": "node_modules/.bin/tsc",
         "start": "node index.js",
         "production-build": "npm install && npm build"
     },
     "dependencies": {
+        "@types/documentdb": "1.10.5",
         "@types/dotenv": "6.1.0",
         "botbuilder": "4.2.0",
         "botbuilder-ai": "4.2.0",

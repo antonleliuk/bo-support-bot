@@ -102,7 +102,23 @@ export class SupportBot {
                         } else {
                             await dc.cancelAllDialogs()
                             // If the top scoring intent was 'None' tell the user no valid intents were found and provide help.
-                            await turnContext.sendActivity('Sorry I can\'t understand. Show some help');
+                            await turnContext.sendActivity({
+                                type: ActivityTypes.Message,
+                                text: 'Sorry I can\'t understand. Show some help',
+                                suggestedActions: {
+                                    to: [
+                                        turnContext.activity.from.id
+                                    ],
+                                    actions: [
+                                        {
+                                            type: ActionTypes.PostBack,
+                                            title: 'Помощь',
+                                            value: 'help',
+                                            channelData: {}
+                                        }
+                                    ]
+                                }
+                            });
                         }
                         break;
                     case DialogTurnStatus.waiting:
