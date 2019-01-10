@@ -86,7 +86,7 @@ const luisApplication: LuisApplication = {
 // Define a state store for your bot.
 // See https://aka.ms/about-bot-state to learn more about using MemoryStorage.
 // A bot requires a state store to persist the dialog and user state between messages.
-// const memoryStorage = new MemoryStorage();
+const memoryStorage = new MemoryStorage();
 // CAUTION: You must ensure your product environment has the NODE_ENV set
 //          to use the Azure Blob storage or Azure Cosmos DB providers.
 // const { BlobStorage } = require('botbuilder-azure');
@@ -95,15 +95,15 @@ const STORAGE_CONFIGURATION_ID = 'storageService';
 // // Default container name
 const DEFAULT_BOT_CONTAINER = 'bo-support-container';
 // // Get service configuration
-const blobStorageConfig = botConfig.findServiceByNameOrId(STORAGE_CONFIGURATION_ID) as BlobStorageService;
-const blobStorage = new BlobStorage({
-    containerName: (blobStorageConfig.container || DEFAULT_BOT_CONTAINER),
-    storageAccountOrConnectionString: blobStorageConfig.connectionString || process.env.microsoftBlobStorageConnection
-});
+// const blobStorageConfig = botConfig.findServiceByNameOrId(STORAGE_CONFIGURATION_ID) as BlobStorageService;
+// const blobStorage = new BlobStorage({
+//     containerName: (blobStorageConfig.container || DEFAULT_BOT_CONTAINER),
+//     storageAccountOrConnectionString: blobStorageConfig.connectionString || process.env.microsoftBlobStorageConnection
+// });
 // conversationState = new ConversationState(blobStorage);
 
 // Create conversation state with in-memory storage provider.
-const conversationState = new ConversationState(blobStorage);
+const conversationState = new ConversationState(memoryStorage);
 
 // Create the main dialog.
 const myBot = new SupportBot(conversationState, qnaEndpointSettings, luisApplication);
